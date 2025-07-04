@@ -1,0 +1,5 @@
+# Flutter / Dart
+.dart_tool/
+build/
+pubspec.lock
+.vscode/
