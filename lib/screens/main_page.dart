@@ -1,0 +1,142 @@
+import 'package:flutter/material.dart';
+import 'package:fitquest/widgets/popup_log.dart'; // Quick popup
+import 'package:fitquest/screens/barcode_scanner_page.dart';      // Barcode scanner screen
+
+/// Main page design with integrated Quick Log functionality.
+class MainPageDesign extends StatefulWidget {
+  const MainPageDesign({Key? key}) : super(key: key);
+
+  @override
+  State<MainPageDesign> createState() => _MainPageDesignState();
+}
+
+class _MainPageDesignState extends State<MainPageDesign> {
+  int _calories = 0;                   // Current calorie count
+  final int _dailyGoal = 2000;         // Daily calorie goal
+
+  @override
+  Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+
+    return Scaffold(
+      appBar: AppBar(
+        title: const Text('FitQuest'),
+        centerTitle: true,
+        elevation: 0,
+      ),
+      body: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.symmetric(horizontal: 16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.stretch,
+            children: [
+              // Top calorie display card
+              Card(
+                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                elevation: 5,
+                child: Padding(
+                  padding: const EdgeInsets.all(16.0),
+                  child: Column(
+                    children: [
+                      Text('Calories', style: theme.textTheme.titleMedium),
+                      const SizedBox(height: 8),
+                      Text('$_calories / $_dailyGoal kcal', style: theme.textTheme.headlineLarge),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Placeholder for weekly progress chart
+              Expanded(
+                child: Card(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 2,
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Padding(
+                        padding: const EdgeInsets.all(16.0),
+                        child: Text('Weekly Progress', style: theme.textTheme.titleMedium),
+                      ),
+                      const Expanded(
+                        child: Center(child: Text('Chart Placeholder')),
+                      ),
+                    ],
+                  ),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Quick Log button
+              ElevatedButton.icon(
+                onPressed: () async {
+                  // Show the quick action popup
+                  final action = await showQuickActionModal(context);
+                  if (action == QuickAction.scanBarcode) {
+                    // Open barcode scanner
+                    final result = await Navigator.push<int>(
+                      context,
+                      MaterialPageRoute(builder: (_) => const BarcodeScannerPage()),
+                    );
+                    if (result != null) {
+                      setState(() => _calories += result);
+                    }
+                  } else if (action == QuickAction.selectWorkout) {
+                    // TODO: Workout Implementation
+                  }
+                },
+                icon: const Icon(Icons.flash_on),
+                label: const Text('Quick Log'),
+                style: ElevatedButton.styleFrom(
+                  padding: const EdgeInsets.symmetric(vertical: 16.0),
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                ),
+              ),
+              const SizedBox(height: 16),
+
+              // Today's entries list placeholder
+              Text('Today’s Entries', style: theme.textTheme.titleMedium),
+              const SizedBox(height: 8),
+              Expanded(
+                child: ListView(
+                  children: const [
+                    ListTile(
+                      leading: Icon(Icons.restaurant_menu),
+                      title: Text('Breakfast: Oatmeal'),
+                      trailing: Text('350 kcal'),
+                    ),
+                    ListTile(
+                      leading: Icon(Icons.fitness_center),
+                      title: Text('Workout: Push-ups'),
+                      trailing: Text('100 kcal'),
+                    ),
+                    Divider(),
+                    ListTile(
+                      leading: Icon(Icons.restaurant_menu),
+                      title: Text('Lunch: Salad'),
+                      trailing: Text('450 kcal'),
+                    ),
+                  ],
+                ),
+              ),
+            ],
+          ),
+        ),
+      ),
+
+      // Navigation bar placeholder
+      bottomNavigationBar: BottomNavigationBar(
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
+          // TODO: Add calendar?
+          BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'Schedule'),
+          // TODO: Add profile?
+          BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
+        ],
+        currentIndex: 0,
+        onTap: (index) {},
+      ),
+    );
+  }
+}
