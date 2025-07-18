@@ -27,46 +27,20 @@ class _MainPageDesignState extends State<MainPageDesign> {
       body: SafeArea(
         child: Padding(
           padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
+          child: ListView(
             children: [
-              // Top calorie display card
-              Card(
-                shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                elevation: 5,
-                child: Padding(
-                  padding: const EdgeInsets.all(16.0),
-                  child: Column(
-                    children: [
-                      Text('Calories', style: theme.textTheme.titleMedium),
-                      const SizedBox(height: 8),
-                      Text('$_calories / $_dailyGoal kcal', style: theme.textTheme.headlineLarge),
-                    ],
-                  ),
+              // Calorie progress indicator
+              Center(
+                child: CircleProgressWidget(
+                  progress: progress,
+                  size: 210,
+                  strokeWidth: 14,
+                  backgroundColor: theme.colorScheme.onSurface.withOpacity(0.1),
+                  progressColor: Colors.greenAccent,
+                  label: '$_calories kcal',
                 ),
               ),
-              const SizedBox(height: 16),
-
-              // Placeholder for weekly progress chart
-              Expanded(
-                child: Card(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  elevation: 2,
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    children: [
-                      Padding(
-                        padding: const EdgeInsets.all(16.0),
-                        child: Text('Weekly Progress', style: theme.textTheme.titleMedium),
-                      ),
-                      const Expanded(
-                        child: Center(child: Text('Chart Placeholder')),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
-              const SizedBox(height: 16),
+              const SizedBox(height: 24),
 
               // Quick Log button
               ElevatedButton.icon(
