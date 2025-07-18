@@ -76,28 +76,37 @@ class _MainPageDesignState extends State<MainPageDesign> {
               // Today's entries list placeholder
               Text('Today’s Entries', style: theme.textTheme.titleMedium),
               const SizedBox(height: 8),
-              Expanded(
-                child: ListView(
-                  children: const [
-                    ListTile(
-                      leading: Icon(Icons.restaurant_menu),
-                      title: Text('Breakfast: Oatmeal'),
-                      trailing: Text('350 kcal'),
-                    ),
-                    ListTile(
-                      leading: Icon(Icons.fitness_center),
-                      title: Text('Workout: Push-ups'),
-                      trailing: Text('100 kcal'),
-                    ),
-                    Divider(),
-                    ListTile(
-                      leading: Icon(Icons.restaurant_menu),
-                      title: Text('Lunch: Salad'),
-                      trailing: Text('450 kcal'),
-                    ),
-                  ],
+
+              // Workouts section
+              if (_dailyWorkouts.isNotEmpty) ...[
+                const Padding(
+                  padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                  child: Text('Workouts', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
+                for (var w in _dailyWorkouts)
+                  ListTile(
+                    leading: const Icon(Icons.fitness_center),
+                    title: Text(w),
+                  ),
+                const Divider(),
+              ],
+
+              // Meals section
+              const Padding(
+                padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
+                child: Text('Meals', style: TextStyle(fontWeight: FontWeight.bold)),
               ),
+              const ListTile(
+                leading: Icon(Icons.restaurant_menu),
+                title: Text('Breakfast: Oatmeal'),
+                trailing: Text('350 kcal'),
+              ),
+              const ListTile(
+                leading: Icon(Icons.restaurant_menu),
+                title: Text('Lunch: Salad'),
+                trailing: Text('450 kcal'),
+              ),
+              const SizedBox(height: 24),
             ],
           ),
         ),
