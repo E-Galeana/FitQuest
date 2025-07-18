@@ -57,7 +57,11 @@ class _MainPageDesignState extends State<MainPageDesign> {
                       setState(() => _calories += result);
                     }
                   } else if (action == QuickAction.selectWorkout) {
-                    // TODO: Workout Implementation
+                    final workout = await Navigator.push<String>(
+                      context,
+                      MaterialPageRoute(builder: (_) => const WorkoutSelectionPage()),
+                    );
+                    if (workout != null) setState(() => _dailyWorkouts.add(workout));
                   }
                 },
                 icon: const Icon(Icons.flash_on),
