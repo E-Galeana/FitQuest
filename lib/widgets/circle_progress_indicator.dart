@@ -122,11 +122,11 @@ class _CirclePainter extends CustomPainter {
     final radius = (size.width - strokeWidth) / 2;
 
     // Draw background ring
-    final bgPaint = Paint()
+    final backgroundPaint = Paint()
       ..color = bgColor
       ..style = PaintingStyle.stroke
       ..strokeWidth = strokeWidth;
-    canvas.drawCircle(center, radius, bgPaint);
+    canvas.drawCircle(center, radius, backgroundPaint);
 
     // Draw progress arc
     final fgPaint = Paint()
