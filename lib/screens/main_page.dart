@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
-import 'package:fitquest/widgets/popup_log.dart'; // Quick popup
-import 'package:fitquest/screens/barcode_scanner_page.dart';      // Barcode scanner screen
+import 'package:fitquest/widgets/popup_log.dart';               // Quick-action modal helper
+import 'package:fitquest/screens/barcode_scanner_page.dart';  // Barcode scanner screen
+import 'package:fitquest/screens/workout_selection.dart'; // Workout selection screen
+import 'package:fitquest/widgets/circle_progress_indicator.dart'; // Circular progress widget
+import 'package:fitquest/screens/calendar_page.dart';         // Calendar view
 
-/// Main page design with integrated Quick Log functionality.
 class MainPageDesign extends StatefulWidget {
-  const MainPageDesign({Key? key}) : super(key: key);
+  const MainPageDesign({super.key});
 
   @override
   State<MainPageDesign> createState() => _MainPageDesignState();
@@ -13,10 +15,12 @@ class MainPageDesign extends StatefulWidget {
 class _MainPageDesignState extends State<MainPageDesign> {
   int _calories = 0;                   // Current calorie count
   final int _dailyGoal = 2000;         // Daily calorie goal
+  final List<String> _dailyWorkouts = [];  // Workouts logged today
 
   @override
   Widget build(BuildContext context) {
     final theme = Theme.of(context);
+    final progress = (_calories / _dailyGoal).clamp(0.0, 1.0);
 
     return Scaffold(
       appBar: AppBar(
@@ -35,9 +39,9 @@ class _MainPageDesignState extends State<MainPageDesign> {
                   progress: progress,
                   size: 210,
                   strokeWidth: 14,
-                  backgroundColor: theme.colorScheme.onSurface.withOpacity(0.1),
+                  backgroundColor: theme.colorScheme.onSurface.withAlpha((0.1 * 255).round()),
                   progressColor: Colors.greenAccent,
-                  label: '$_calories kcal',
+                  label: '$_calories / $_dailyGoal cal',
                 ),
               ),
               const SizedBox(height: 24),
@@ -45,17 +49,13 @@ class _MainPageDesignState extends State<MainPageDesign> {
               // Quick Log button
               ElevatedButton.icon(
                 onPressed: () async {
-                  // Show the quick action popup
                   final action = await showQuickActionModal(context);
                   if (action == QuickAction.scanBarcode) {
-                    // Open barcode scanner
                     final result = await Navigator.push<int>(
                       context,
                       MaterialPageRoute(builder: (_) => const BarcodeScannerPage()),
                     );
-                    if (result != null) {
-                      setState(() => _calories += result);
-                    }
+                    if (result != null) setState(() => _calories += result);
                   } else if (action == QuickAction.selectWorkout) {
                     final workout = await Navigator.push<String>(
                       context,
@@ -71,13 +71,25 @@ class _MainPageDesignState extends State<MainPageDesign> {
                   shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
                 ),
               ),
+              const SizedBox(height: 24),
+
+              // Weekly progress placeholder
+              Text('Weekly Progress', style: theme.textTheme.titleMedium),
+              const SizedBox(height: 8),
+              SizedBox(
+                height: 200,
+                child: Card(
+                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
+                  elevation: 2,
+                  child: const Center(child: Text('Chart Placeholder')),
+                ),
+              ),
               const SizedBox(height: 16),
 
               // Today's entries list placeholder
               Text('Today’s Entries', style: theme.textTheme.titleMedium),
               const SizedBox(height: 8),
-
-              // Workouts section
+              // Workouts
               if (_dailyWorkouts.isNotEmpty) ...[
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
@@ -90,7 +102,6 @@ class _MainPageDesignState extends State<MainPageDesign> {
                   ),
                 const Divider(),
               ],
-
               // Meals section
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
@@ -111,18 +122,23 @@ class _MainPageDesignState extends State<MainPageDesign> {
           ),
         ),
       ),
-
       // Navigation bar placeholder
       bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          // TODO: Add calendar?
           BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'Schedule'),
-          // TODO: Add profile?
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
         currentIndex: 0,
-        onTap: (index) {},
+        onTap: (index) {
+          if (index == 1) {
+            Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const CalendarPage()),
+            );
+          }
+          // other tabs can be added here
+        },
       ),
     );
   }
