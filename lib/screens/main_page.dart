@@ -1,9 +1,10 @@
 import 'package:flutter/material.dart';
 import 'package:fitquest/widgets/popup_log.dart';               // Quick-action modal helper
 import 'package:fitquest/screens/barcode_scanner_page.dart';  // Barcode scanner screen
-import 'package:fitquest/screens/workout_selection.dart'; // Workout selection screen
+import 'package:fitquest/screens/workout_selection.dart';     // Workout selection screen
 import 'package:fitquest/widgets/circle_progress_indicator.dart'; // Circular progress widget
 import 'package:fitquest/screens/calendar_page.dart';         // Calendar view
+import 'package:fitquest/widgets/weekly_chart.dart'; // Weekly chart widget
 
 class MainPageDesign extends StatefulWidget {
   const MainPageDesign({super.key});
@@ -73,15 +74,14 @@ class _MainPageDesignState extends State<MainPageDesign> {
               ),
               const SizedBox(height: 24),
 
-              // Weekly progress placeholder
+              // Weekly progress placeholder replaced with chart
               Text('Weekly Progress', style: theme.textTheme.titleMedium),
               const SizedBox(height: 8),
               SizedBox(
                 height: 200,
-                child: Card(
-                  shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-                  elevation: 2,
-                  child: const Center(child: Text('Chart Placeholder')),
+                child: WeeklyCaloriesChart(
+                  dailyCalories: [1200, 1500, 1800, 1700, 1600, 2100, 1400],
+                  dailyGoal: _dailyGoal.toDouble(),
                 ),
               ),
               const SizedBox(height: 16),
