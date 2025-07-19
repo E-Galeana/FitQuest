@@ -1,6 +1,4 @@
 import 'package:flutter/material.dart';
-import 'screens/barcode_scanner_page.dart';
-import 'package:fitquest/widgets/popup_log.dart';
 import 'screens/main_page.dart';
 
 void main() => runApp(const MyApp());

@@ -2,11 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:mobile_scanner/mobile_scanner.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
-import 'dart:convert';
-import 'package:http/http.dart' as http;
-/// Fetches calories per serving via the OpenFoodFacts API.
-import 'dart:convert';
-import 'package:http/http.dart' as http;
 
 Future<int?> fetchCaloriesForBarcode(String code) async {
   final url = Uri.parse('https://world.openfoodfacts.org/api/v0/product/$code.json');
@@ -48,22 +43,22 @@ class BarcodeScannerPage extends StatefulWidget {
 }
 
 class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
-  final MobileScannerController _scannerController =
+  final MobileScannerController scannerController =
   MobileScannerController(detectionSpeed: DetectionSpeed.noDuplicates);
-  bool _isProcessing = false;
+  bool isProcessing = false;
 
   void _onDetect(BarcodeCapture capture) async {
-    if (_isProcessing) return;
+    if (isProcessing) return;
     final code = capture.barcodes.first.rawValue;
     if (code == null) return;
 
-    setState(() => _isProcessing = true);
+    setState(() => isProcessing = true);
     final calories = await fetchCaloriesForBarcode(code);
     if (calories == null) {
       ScaffoldMessenger.of(context).showSnackBar(
         const SnackBar(content: Text('Food data not found')),
       );
-      setState(() => _isProcessing = false);
+      setState(() => isProcessing = false);
     } else {
       Navigator.of(context).pop(calories);
     }
@@ -72,7 +67,7 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
 
   @override
   void dispose() {
-    _scannerController.dispose();
+    scannerController.dispose();
     super.dispose();
   }
 
@@ -83,10 +78,10 @@ class _BarcodeScannerPageState extends State<BarcodeScannerPage> {
       body: Stack(
         children: [
           MobileScanner(
-            controller: _scannerController,
+            controller: scannerController,
             onDetect: _onDetect,
           ),
-          if (_isProcessing)
+          if (isProcessing)
             Container(
               color: Colors.black45,
               child: const Center(child: CircularProgressIndicator()),
