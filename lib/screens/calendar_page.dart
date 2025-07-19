@@ -1,8 +1,15 @@
-// calendar_page.dart
 import 'package:flutter/material.dart';
 
-class CalendarPage extends StatelessWidget {
-  const CalendarPage({super.key});
+class CalendarPage extends StatefulWidget {
+  const CalendarPage({Key? key}) : super(key: key);
+
+  @override
+  State<CalendarPage> createState() => _CalendarPageState();
+}
+
+class _CalendarPageState extends State<CalendarPage> {
+  // Currently selected date
+  DateTime selectedDate = DateTime.now();
 
   @override
   Widget build(BuildContext context) {
@@ -10,11 +17,26 @@ class CalendarPage extends StatelessWidget {
       appBar: AppBar(
         title: const Text('Calendar'),
       ),
-      body: const Center(
-        child: Text(
-          'Calendar View - Coming Soon!',
-          style: TextStyle(fontSize: 20),
-        ),
+      body: Column(
+        children: [
+          // Native Flutter calendar picker
+          CalendarDatePicker(
+            initialDate: selectedDate,
+            firstDate: DateTime.now().subtract(const Duration(days: 365)),
+            lastDate: DateTime.now().add(const Duration(days: 365)),
+            onDateChanged: (date) {
+              setState(() {
+                selectedDate = date;
+              });
+            },
+          ),
+          const SizedBox(height: 16),
+          // Show currently selected date
+          Text(
+            'Selected: ${selectedDate.month}/${selectedDate.day}/${selectedDate.year}',
+            style: const TextStyle(fontSize: 18, fontWeight: FontWeight.w500),
+          ),
+        ],
       ),
     );
   }
