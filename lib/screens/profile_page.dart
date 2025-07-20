@@ -19,6 +19,7 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
   final TextEditingController ageController = TextEditingController();    // in years
 
   String gender = 'male'; // Default value
+  double activityFactor = 1.55; // Default moderate
   double? maintenanceCalories;
 
   @override
@@ -36,10 +37,11 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
       weightController.text = prefs.getDouble('weight')?.toString() ?? '';
       ageController.text = prefs.getInt('age')?.toString() ?? '';
       gender = prefs.getString('gender') ?? 'male';
+      activityFactor = prefs.getDouble('activityFactor') ?? 1.55;
       maintenanceCalories = prefs.getDouble('maintenance');
     });
   }
-// Based on Mifflin–St formula 
+  // Based on Mifflin–St formula
   Future<void> calculateMaintenanceCalories() async {
     final height = double.tryParse(heightController.text);
     final weight = double.tryParse(weightController.text);
@@ -50,13 +52,14 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
           ? (10 * weight) + (6.25 * height) - (5 * age) + 5
           : (10 * weight) + (6.25 * height) - (5 * age) - 161;
 
-      final mCal = bmr * 1.55; // Moderate activity
+      final mCal = bmr * activityFactor;
       final prefs = await SharedPreferences.getInstance();
       await prefs.setString('name', nameController.text);
       await prefs.setDouble('height', height);
       await prefs.setDouble('weight', weight);
       await prefs.setInt('age', age);
       await prefs.setString('gender', gender);
+      await prefs.setDouble('activityFactor', activityFactor);
       await prefs.setDouble('maintenance', mCal);
 
       setState(() {
@@ -82,10 +85,12 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
       body: TabBarView(
         controller: tabController,
         children: [
+          // Info tab
           Padding(
             padding: const EdgeInsets.all(16.0),
             child: SingleChildScrollView(
               child: Column(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   TextField(
                     controller: nameController,
@@ -121,25 +126,48 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                             groupValue: gender,
                             onChanged: (value) => setState(() => gender = value!),
                           ),
-                        ),
-                      ),
-                      Expanded(
-                        child: ListTile(
-                          title: const Text('Female'),
-                          leading: Radio<String>(
+                          const Text('Male', style: TextStyle(fontSize: 14)),
+                          const SizedBox(width: 16),
+                          Radio<String>(
                             value: 'female',
                             groupValue: gender,
                             onChanged: (value) => setState(() => gender = value!),
                           ),
-                        ),
+                          const Text('Female', style: TextStyle(fontSize: 14)),
+                        ],
+                      ),
+                    ],
+                  ),
+
+                  const SizedBox(height: 16),
+
+                  // Activity level selection
+                  Row(
+                    children: [
+                      const Text("Activity: "),
+                      const SizedBox(width: 16),
+                      DropdownButton<double>(
+                        value: activityFactor,
+                        items: const [
+                          DropdownMenuItem(value: 1.2, child: Text('Sedentary')),
+                          DropdownMenuItem(value: 1.375, child: Text('Light')),
+                          DropdownMenuItem(value: 1.55, child: Text('Moderate')),
+                          DropdownMenuItem(value: 1.725, child: Text('Active')),
+                          DropdownMenuItem(value: 1.9, child: Text('Very Active')),
+                        ],
+                        onChanged: (value) => setState(() {
+                          if (value != null) activityFactor = value;
+                        }),
                       ),
                     ],
                   ),
 
                   const SizedBox(height: 24),
-                  ElevatedButton(
-                    onPressed: calculateMaintenanceCalories,
-                    child: const Text("Save and Return"),
+                  Center(
+                    child: ElevatedButton(
+                        onPressed: calculateMaintenanceCalories,
+                        child: const Text("Save and Return"),
+                    ),
                   ),
                 ],
               ),
@@ -148,12 +176,30 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
 
           // Result tab
           Center(
-            child: maintenanceCalories == null
-                ? const Text("Enter your info to calculate")
-                : Text(
-              "Your estimated daily maintenance calories:\n${maintenanceCalories!.round()} kcal",
-              style: Theme.of(context).textTheme.headlineSmall,
-              textAlign: TextAlign.center,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: maintenanceCalories == null
+                  ? [
+                const Text("Enter your info to calculate"),
+              ]
+                  : [
+                Text(
+                  "Your estimated BMR: ${maintenanceCalories!.round()} calories",
+                  style: Theme.of(context).textTheme.headlineSmall,
+                  textAlign: TextAlign.center,
+                ),
+                const SizedBox(height: 16),
+                // Show chosen activity level
+                Text(
+                  'Activity factor: ${activityFactor.toStringAsFixed(3)}',
+                  style: Theme.of(context).textTheme.bodyMedium,
+                ),
+                const SizedBox(height: 16),
+                ElevatedButton(
+                  onPressed: calculateMaintenanceCalories,
+                  child: const Text("Recalculate"),
+                ),
+              ],
             ),
           ),
         ],
