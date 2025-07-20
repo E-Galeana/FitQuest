@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 
+// By Aidan Lawall
+
 class ProfilePage extends StatefulWidget {
   const ProfilePage({super.key});
 
