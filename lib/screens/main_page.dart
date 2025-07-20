@@ -100,13 +100,23 @@ class _MainPageDesignState extends State<MainPageDesign> {
               ),
               const SizedBox(height: 24),
 
-              // Weekly progress chart
+              // Updated weekly chart
               Text('Weekly Progress', style: theme.textTheme.titleMedium),
               const SizedBox(height: 8),
               SizedBox(
                 height: 200,
                 child: WeeklyCaloriesChart(
-                  dailyCalories: [1200, 1500, 1800, 1700, 1600, 2100, 1400],
+                  dailyCalories: [
+                    for (int i = 0; i < 7; i++)
+                      i == DateTime
+                          .now()
+                          .weekday - 1
+                          ? dailyMeals.fold<double>(
+                        0,
+                            (sum, m) => sum + (m['calories'] as int).toDouble(),
+                      )
+                          : 0,
+                  ],
                   dailyGoal: _dailyGoal.toDouble(),
                 ),
               ),
@@ -146,7 +156,8 @@ class _MainPageDesignState extends State<MainPageDesign> {
       bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
-          BottomNavigationBarItem(icon: Icon(Icons.calendar_today), label: 'Schedule'),
+          BottomNavigationBarItem(icon: Icon(Icons.calendar_today),
+              label: 'Schedule'),
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
         currentIndex: 0,
