@@ -152,6 +152,7 @@ class _MainPageDesignState extends State<MainPageDesign> {
               context,
               MaterialPageRoute(builder: (_) => const CalendarPage()),
             );
+            // Profile Page By Aidan Lawall
           } else if (index == 2) {
             final result = await Navigator.push<int>(
               context,
