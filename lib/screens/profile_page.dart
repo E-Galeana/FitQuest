@@ -112,10 +112,11 @@ class _ProfilePageState extends State<ProfilePage> with SingleTickerProviderStat
                   Row(
                     children: [
                       const Text("Gender: "),
-                      Expanded(
-                        child: ListTile(
-                          title: const Text('Male'),
-                          leading: Radio<String>(
+                      const SizedBox(width: 35),
+                      Row(
+                        mainAxisSize: MainAxisSize.min,
+                        children: [
+                          Radio<String>(
                             value: 'male',
                             groupValue: gender,
                             onChanged: (value) => setState(() => gender = value!),
