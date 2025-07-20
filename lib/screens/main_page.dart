@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:fitquest/widgets/popup_log.dart';               // Quick-action modal helper
 import 'package:fitquest/screens/barcode_scanner_page.dart';  // Barcode scanner screen
 import 'package:fitquest/screens/workout_selection.dart';     // Workout selection screen
 import 'package:fitquest/widgets/circle_progress_indicator.dart'; // Circular progress widget
 import 'package:fitquest/screens/calendar_page.dart';         // Calendar view
 import 'package:fitquest/widgets/weekly_chart.dart'; // Weekly chart widget
+import 'package:fitquest/screens/profile_page.dart';          // Profile page
 
 class MainPageDesign extends StatefulWidget {
   const MainPageDesign({super.key});
@@ -15,8 +17,22 @@ class MainPageDesign extends StatefulWidget {
 
 class _MainPageDesignState extends State<MainPageDesign> {
   int _calories = 0;                   // Current calorie count
-  final int _dailyGoal = 2000;         // Daily calorie goal
+  int _dailyGoal = 2000;               // Daily calorie goal (will be loaded)
   final List<String> _dailyWorkouts = [];  // Workouts logged today
+
+  @override
+  void initState() {
+    super.initState();
+    loadDailyGoal();
+  }
+
+  Future<void> loadDailyGoal() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getDouble('maintenance')?.round();
+    if (saved != null) {
+      setState(() => _dailyGoal = saved);
+    }
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -40,7 +56,9 @@ class _MainPageDesignState extends State<MainPageDesign> {
                   progress: progress,
                   size: 210,
                   strokeWidth: 14,
-                  backgroundColor: theme.colorScheme.onSurface.withAlpha((0.1 * 255).round()),
+                  backgroundColor: theme
+                      .colorScheme.onSurface
+                      .withAlpha((0.1 * 255).round()),
                   progressColor: Colors.greenAccent,
                   label: '$_calories / $_dailyGoal cal',
                 ),
@@ -74,7 +92,7 @@ class _MainPageDesignState extends State<MainPageDesign> {
               ),
               const SizedBox(height: 24),
 
-              // Weekly progress placeholder replaced with chart
+              // Weekly progress chart
               Text('Weekly Progress', style: theme.textTheme.titleMedium),
               const SizedBox(height: 8),
               SizedBox(
@@ -86,10 +104,9 @@ class _MainPageDesignState extends State<MainPageDesign> {
               ),
               const SizedBox(height: 16),
 
-              // Today's entries list placeholder
+              // Today's entries list
               Text('Today’s Entries', style: theme.textTheme.titleMedium),
               const SizedBox(height: 8),
-              // Workouts
               if (_dailyWorkouts.isNotEmpty) ...[
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
@@ -102,7 +119,6 @@ class _MainPageDesignState extends State<MainPageDesign> {
                   ),
                 const Divider(),
               ],
-              // Meals section
               const Padding(
                 padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                 child: Text('Meals', style: TextStyle(fontWeight: FontWeight.bold)),
@@ -122,7 +138,7 @@ class _MainPageDesignState extends State<MainPageDesign> {
           ),
         ),
       ),
-      // Navigation bar placeholder
+      // Bottom navigation bar
       bottomNavigationBar: BottomNavigationBar(
         items: const [
           BottomNavigationBarItem(icon: Icon(Icons.home), label: 'Home'),
@@ -130,14 +146,21 @@ class _MainPageDesignState extends State<MainPageDesign> {
           BottomNavigationBarItem(icon: Icon(Icons.person), label: 'Profile'),
         ],
         currentIndex: 0,
-        onTap: (index) {
+        onTap: (index) async {
           if (index == 1) {
             Navigator.push(
               context,
               MaterialPageRoute(builder: (_) => const CalendarPage()),
             );
+          } else if (index == 2) {
+            final result = await Navigator.push<int>(
+              context,
+              MaterialPageRoute(builder: (_) => const ProfilePage()),
+            );
+            if (result != null) {
+              setState(() => _dailyGoal = result);
+            }
           }
-          // other tabs can be added here
         },
       ),
     );
