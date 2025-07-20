@@ -101,7 +101,7 @@ class _MainPageDesignState extends State<MainPageDesign> {
               const SizedBox(height: 24),
 
               // Updated weekly chart
-              Text('Weekly Progress', style: theme.textTheme.titleMedium),
+              Text('Weekly Progress', style: theme.textTheme.titleMedium, textAlign: TextAlign.center),
               const SizedBox(height: 8),
               SizedBox(
                 height: 200,
