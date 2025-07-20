@@ -5,7 +5,7 @@ import 'package:fitquest/screens/barcode_scanner_page.dart';  // Barcode scanner
 import 'package:fitquest/screens/workout_selection.dart';     // Workout selection screen
 import 'package:fitquest/widgets/circle_progress_indicator.dart'; // Circular progress widget
 import 'package:fitquest/screens/calendar_page.dart';         // Calendar view
-import 'package:fitquest/widgets/weekly_chart.dart'; // Weekly chart widget
+import 'package:fitquest/widgets/weekly_chart.dart';          // Weekly chart widget
 import 'package:fitquest/screens/profile_page.dart';          // Profile page
 
 class MainPageDesign extends StatefulWidget {
@@ -17,8 +17,11 @@ class MainPageDesign extends StatefulWidget {
 
 class _MainPageDesignState extends State<MainPageDesign> {
   int _calories = 0;                   // Current calorie count
-  int _dailyGoal = 2000;               // Daily calorie goal (will be loaded)
-  final List<String> _dailyWorkouts = [];  // Workouts logged today
+  int _dailyGoal = 2000;               // Daily calorie goal default
+  final List<String> dailyWorkouts = [];  // Workouts logged today
+
+  // Meals logged with name and calories
+  final List<Map<String, dynamic>> dailyMeals = [];
 
   @override
   void initState() {
@@ -70,17 +73,22 @@ class _MainPageDesignState extends State<MainPageDesign> {
                 onPressed: () async {
                   final action = await showQuickActionModal(context);
                   if (action == QuickAction.scanBarcode) {
-                    final result = await Navigator.push<int>(
+                    final product = await Navigator.push<Map<String, dynamic>>(
                       context,
                       MaterialPageRoute(builder: (_) => const BarcodeScannerPage()),
                     );
-                    if (result != null) setState(() => _calories += result);
+                    if (product != null) {
+                      setState(() {
+                        dailyMeals.add(product);
+                        _calories += product['calories'] as int;
+                      });
+                    }
                   } else if (action == QuickAction.selectWorkout) {
                     final workout = await Navigator.push<String>(
                       context,
                       MaterialPageRoute(builder: (_) => const WorkoutSelectionPage()),
                     );
-                    if (workout != null) setState(() => _dailyWorkouts.add(workout));
+                    if (workout != null) setState(() => dailyWorkouts.add(workout));
                   }
                 },
                 icon: const Icon(Icons.flash_on),
@@ -107,12 +115,12 @@ class _MainPageDesignState extends State<MainPageDesign> {
               // Today's entries list
               Text('Today’s Entries', style: theme.textTheme.titleMedium),
               const SizedBox(height: 8),
-              if (_dailyWorkouts.isNotEmpty) ...[
+              if (dailyWorkouts.isNotEmpty) ...[
                 const Padding(
                   padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                   child: Text('Workouts', style: TextStyle(fontWeight: FontWeight.bold)),
                 ),
-                for (var w in _dailyWorkouts)
+                for (var w in dailyWorkouts)
                   ListTile(
                     leading: const Icon(Icons.fitness_center),
                     title: Text(w),
@@ -123,16 +131,12 @@ class _MainPageDesignState extends State<MainPageDesign> {
                 padding: EdgeInsets.symmetric(horizontal: 8.0, vertical: 4.0),
                 child: Text('Meals', style: TextStyle(fontWeight: FontWeight.bold)),
               ),
-              const ListTile(
-                leading: Icon(Icons.restaurant_menu),
-                title: Text('Breakfast: Oatmeal'),
-                trailing: Text('350 kcal'),
-              ),
-              const ListTile(
-                leading: Icon(Icons.restaurant_menu),
-                title: Text('Lunch: Salad'),
-                trailing: Text('450 kcal'),
-              ),
+              for (var meal in dailyMeals)
+                ListTile(
+                  leading: const Icon(Icons.restaurant_menu),
+                  title: Text(meal['name'] as String),
+                  trailing: Text('${meal['calories']} cal'),
+                ),
               const SizedBox(height: 24),
             ],
           ),
