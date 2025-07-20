@@ -29,7 +29,8 @@ class WeeklyCaloriesChart extends StatelessWidget {
               interval: dailyGoal / 4,
               getTitlesWidget: (value, meta) => Text(
                 value.toInt().toString(),
-                style: theme.textTheme.bodySmall,
+                style: theme.textTheme.labelSmall?.copyWith(fontSize: 8),
+                textAlign: TextAlign.left,
               ),
             ),
           ),
